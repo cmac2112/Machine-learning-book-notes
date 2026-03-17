@@ -123,3 +123,9 @@ Using a <b>Hierarchical clustering</b> algorithm could further subdivide each gr
  you train the system incrementally by feeding it data instances sequentially, either individually or in small groups called mini-batches. Each learning step is fast and cheap so the system can learn about new data on the fly as it arrives.
 
  Model is launched and keeps learning as new data comes in
+
+ online learning is useful for systems that need to adapt to change extremely rapidly
+
+ additionally online learning algorithms can be used to train models on huge datasets that cannot fit in one machines main memory (aka out ofg core learning)
+
+ Another important parameter of online learning systems is how fast they should adapt to chaning data, also known as the <b>Learning Rate</b>
