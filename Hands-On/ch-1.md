@@ -117,7 +117,12 @@ Using a <b>Hierarchical clustering</b> algorithm could further subdivide each gr
  ### Batch vs online learning
  used to classfiy learning systems that can learn incrementally from a stream of incoming data
 
- <b>Batch Learning</b> the system is incapable of learning incrementally. This is typically done offline and then launched into production. Systems performance typically degrades overtime due to the evolving nature of behavior and data in the world.
+ ### Batch learning
+ in batch learning the system in incapable of learning incrementally: it must be trained using all the available data. 
+
+ Takes a lot of time and hence typically done offline. 
+
+ Because of its nature of being taught only once and deployed, its performance decays slowly over time. This is called model rot or data drift. The solution is to regularly retrain the model on up to date data.
 
  ### Online learning
  you train the system incrementally by feeding it data instances sequentially, either individually or in small groups called mini-batches. Each learning step is fast and cheap so the system can learn about new data on the fly as it arrives.
@@ -129,3 +134,19 @@ Using a <b>Hierarchical clustering</b> algorithm could further subdivide each gr
  additionally online learning algorithms can be used to train models on huge datasets that cannot fit in one machines main memory (aka out ofg core learning)
 
  Another important parameter of online learning systems is how fast they should adapt to chaning data, also known as the <b>Learning Rate</b>
+ 
+### Instance-Baed vs Model-Based Learning
+one more way to categorize machine learning systems is by how they generalize. This means that given a number of training examples, the system needs to be able to make good predictions for (generalize to) examples it has never seen before.
+
+There are two main approaches to generalization: Instance-based learning and model-based learning
+
+### Instance-Based learning
+Most trivial form of learning is to learn by heart.
+
+Ex: spam filter filters out emails that are identical to emails that have already been flagged by users. Not worst solution but not the best
+
+Instead your spam filter could flag emails that are very similar to known spam emails. This requires a <b>Measure of simularity</b> between emails.
+
+IE: system could count the number of words they have in common etc.
+
+This is called instance based learning: the system learns the examples by heart, then generalizes to new cases by using a similarity measure to compare them to learned examples.
