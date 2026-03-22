@@ -150,3 +150,97 @@ Instead your spam filter could flag emails that are very similar to known spam e
 IE: system could count the number of words they have in common etc.
 
 This is called instance based learning: the system learns the examples by heart, then generalizes to new cases by using a similarity measure to compare them to learned examples.
+
+### model based learning
+Another way to generalize from a set of examples is to build a model of examples then use that model to make predictions
+
+
+## Linear regression example
+/ch1Programs/1-1linearRegressionModel.py
+
+Things to note more about linear regression
+
+How to determine a loss function. A loss function is most commonly measured using <b>Mean Squared Error</b>
+
+Equation:
+    1. Take the difference between actual and predicted values
+    2. Square it so negatives dont cancel positives
+    3. averave over all data points
+
+### K nearest neighbors
+if we used an instance based learning algorithm instead and used the average of the 3 nearest neighbors
+
+`model = KNeighborsRegressor(n_neighbors=3)`
+we get 6.33 which is very close to the original model based prediction
+
+## Data quality
+most of the time spent making models is cleaning up data and figuring out what parameters to use.
+
+Garbage in garbage out your system is only as capable as the data your provide it
+
+### Overfitting
+means that the model performs well on the trainting data but does not generalize well
+
+Overfitting happens when the model is too complex relative to the amount and noiseness of the training data. Possible solutions are
+1. Simply the model by selecting one with fewer parameters (ex a linear model rather than a hiigh degree polynomial) by reduing the number of attributes in the training data, or by constraining the model
+2. Gather more training data
+3. reduce the noise in training data
+
+Constraining a model to make it simpler is called <b>Regularization</b>. The model we defined before only has two degrees of freedom <b>Theta0 (height)</b> and <b>Theta1(slope)</b>
+
+The amount of regularization to apply during learning is called a <b>HyperParameter</b>. It is not affected by the learning algorithm itself. If you set this to a very large value your model will become quite flat and will not overfit.
+
+
+### underfitting
+Underfittin is the opposite of overfitting, it occurs when your model is too simple to learn the underlying structure of the data.
+
+How to fix:
+1.  select a more powerful model with more parameters
+2. feed better features to the learning algorithm
+3. reduce the constraints on the model
+
+# Chapter quiz
+
+1. How would you define machine learning :
+        Machine learning is the action of predicting future values based on the values of the past. Rather than programatically, these systems can be used to attempt to solve problems that dont have dedicated solutions
+2. Can you name four types of applications where it shines
+        When problems have no algorithmic solution, replace long lists of hand-tuned rules, build systems that adapt to fluctuating environments, and finally help humans learn
+
+3. what is a labeled training set
+    Labeled training set is a training set that basically has the answer tied to it. Someone has defined that piece of data as what it is, such as if a picture of a flower, it has been dedicated as a flower.
+4. What are the two most common supervised tasks?
+    Classification and regression
+5. Can you name four uncommon supervised tasks
+    Visualization, clustering, Anamoly detection
+
+6. What type of alogriithm would you use to allow a robot to walk in various unknown terriains?
+        Reinforcement learning
+7. What type of algorithm would you use to segment your customers into multiple groups?
+        - unsupervised clustering algorithm
+8. Would you frame the problem of spam detection as a supevised learning problem or an unsupervised learning problem?
+        A supervised learning problem, users can mark items as spam which can be used as training data on our model, the model will have to be retrained frequently as spam mail evolves however. We should not use unsupervised here because the model could pick up on things that are not spam and block important emails from reaching users.
+9. What is an online learning system
+    An online learning system is a system that can learn on the fly with new data it is provided with
+10. What is out of core learning
+    Not all training data can fit onto a machine, some data must live elsewhere and be incrementially trained on
+
+11. What type of algorithm relies on a similarity measure to make predictions?
+    Instance Based learining
+
+12. What is the difference between a model parameter and a model hyperparameter
+    A model parameter is what the model uses to learn against, a hyper parameter is independent of that but can still affect the output of the model
+
+13. What do model based algorithms search for? What is the most common strategy they use to succeed? How do they make predictions
+    The model based algorithm searches for similarity between models. 
+
+14. What are the four main challenges of machine learning
+    Data insufficency, non-representive training data, poor data quality, irrelevant features, overfitting/underfitting
+
+15. If your model performs great on the training data buut generalizes poorly to new instances, what is happening? Can you name three possible solutions
+    What is happening is the model is overfitting the data. There are 3 things you can do. 1 Simplify the model. 2 Gather more training data. 3 Reduce the noise in the training data
+
+16. What is a test set, and why would you want to use it?
+    A test set of data is data that you set aside that the model will not train on. Instead you will feed the model this data after it has been trained to test its accuracy
+
+17. What is the purpose of a validation set?
+    The purpose of the validation set is to test groups of models on that perform the best on the validation set, then move that model on to the main test set. 
