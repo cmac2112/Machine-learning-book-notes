@@ -48,8 +48,8 @@ def clean_data(data):
     std_scalar = StandardScaler()
     housing_num_std_scalar = std_scalar.fit_transform(housing_num)
     
+    #continuing data transformation next, data needs to be formatted as close as possible to a bell curve
     
-        
     return
 
 
