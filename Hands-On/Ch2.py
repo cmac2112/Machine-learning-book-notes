@@ -5,6 +5,55 @@ import tarfile
 import urllib.request
 import numpy as np
 import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler, StandardScaler
+def clean_data(data):
+    #median = data["total_bedrooms"].median()
+    #data["total_bedrooms"].fillna(median, inplace=True)
+
+    #instantiate an imputer (defining missing values as their columns median to not skew data as bad)
+    imputer = SimpleImputer(strategy="median")
+
+    #not all columns are int's
+    #get only int's to caclulate the median
+
+    housing_num = data.select_dtypes(include=[np.number])
+    
+    imputer.fit(housing_num)
+
+    #translate ocean proximity to a numerical value
+    housing_category = data[["ocean_proximity"]]
+    
+    ordinal_encoder = OrdinalEncoder()
+    
+    housing_category_encoded = ordinal_encoder.fit_transform(housing_category)
+
+    #hot encoder to create binary attributes per category
+
+    cat_encoder = OneHotEncoder()
+    #returns a sparce matrix
+    housing_category_hot = cat_encoder.fit_transform(housing_category)
+    
+    #next we need to standardize our data, such as the median income
+    # we can minmax here aka normalization, values are shifted and rescaled so that they end up ranging from 0 to 1.
+    # This is done by subtracting the min value and dividing by the difference between the min and the max
+    
+    min_max_scaler = MinMaxScaler(feature_range=(-1, 1))
+    housing_num_min_max_scaled = min_max_scaler.fit_transform(housing_num)
+    
+    #or use standardization here which is different, first it sutracts the mean, then it divides the result by the standard deviation, so standardized values have a standard deviation equal to 1
+    #standardiization does not restrict values to a certain range, however it is much less affected by outliers.\
+    
+    std_scalar = StandardScaler()
+    housing_num_std_scalar = std_scalar.fit_transform(housing_num)
+    
+    
+        
+    return
+
+
+
 #shuffle the data and set aside test data
 #each time this is called it will return a different set of data
 def shuffle_and_split_data(data, test_ratio):
@@ -41,19 +90,25 @@ def load_housing_data():
     return pd.read_csv(Path("datasets/housing/housing.csv"))
 
 def main():
-    california_housing = fetch_california_housing(as_frame=True)
+
+
+    #california_housing = fetch_california_housing(as_frame=True)
     housing = load_housing_data()
+    
+    clean_data(housing)
+    return
 
     #plot housing just for visualization
 
-    # housing.plot(kind="scatter", x="longitude", y="latitude", grid=True)
-    # plt.show()
+    housing.plot(kind="scatter", x="longitude", y="latitude", grid=True, s=housing["population"] / 100, label="population", c="median_house_value", colormap="jet", colorbar=True,
+                 legend=True, sharex=False, figsize=(10,7))
+    plt.show()
 
-    # plt.savefig("housingscatter.png")
+    plt.savefig("housingscatter.png")
 
     # housing.hist(bins=50, figsize=(12,8))
-    # plt.show()
-    # plt.savefig("housingHistograms.png")
+    #plt.show()
+    #plt.savefig("housingHistograms.png")
     
     
     housing["income_cat"] = pd.cut(housing["median_income"],
@@ -68,6 +123,30 @@ def main():
     #shuffle data and return train and test sets
     train_set, test_set = shuffle_and_split_data(housing, 0.2)
     print(len(train_set), len(test_set))
+
+
+    #corr_matrix = housing.corr()
+
+    #vals = corr_matrix["median_house_value"].sort_values(ascending=False)
+    
+    #scatter matrix to see correlation between values
+
+    attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
+    scatter_matrix(housing[attributes], figsize=(12, 8))
+    plt.show()
+    plt.savefig("scatter_correlations")
+
+    #lets view the correlation between the price and the bedroom ratio (num of beds / num of total rooms)
+
+    housing["bedroom_ratio"] = housing["total_bedrooms"] / housing["total_rooms"]
+
+    housing.plot(kind="scatter", x="median_house_value", y="bedroom_ratio", grid=True)
+    plt.show()
+
+    plt.savefig("bedroom_ratio")
+
+
+
 
 
 if __name__ == "__main__":
