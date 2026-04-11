@@ -7,7 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pandas.plotting import scatter_matrix
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler, StandardScaler, FunctionTransformer
+from ClusterSimularity import ClusterSimularity
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.compose import ColumnTransformer, make_column_selector, make_column_transformer
+#This program is ripped mostly from the book, once all programming is copied over here, i will perform my own version as if it were a real project
+
 def clean_data(data):
     #median = data["total_bedrooms"].median()
     #data["total_bedrooms"].fillna(median, inplace=True)
@@ -49,6 +54,75 @@ def clean_data(data):
     housing_num_std_scalar = std_scalar.fit_transform(housing_num)
     
     #continuing data transformation next, data needs to be formatted as close as possible to a bell curve
+    
+    #here we will write a log-transformer and apply it to the populatiion freature
+    # we are doing this because of the heavy tail it has
+    
+    log_transformer = FunctionTransformer(np.log, inverse_func=np.exp)
+    log_pop = log_transformer.transform(data[["population"]])
+    
+    # here is an example of a custom transformer
+    cluster_simu = ClusterSimularity(n_clusters=10, gamma=1, random_state=42)
+    similarities = cluster_simu.fit_transform(data[["latitude", "longitude"]], sample_weight=data["population"])
+    
+    # plt.figure(figsize=(12, 8))
+    # scatter = plt.scatter(data["longitude"], data["latitude"], 
+    #                      c=similarities.max(axis=1),  # Color by max similarity
+    #                      cmap="viridis", s=30, alpha=0.6)
+    # plt.colorbar(scatter, label="Max Cluster Similarity")
+    # plt.xlabel("Longitude")
+    # plt.ylabel("Latitude")
+    # plt.title("Cluster Similarities by Geographic Location")
+    # plt.show()
+    # plt.savefig("cluster_similarities.png")
+    
+    #print(similarities[:3].round(2))
+    
+    
+    # there are many transformation steps tha need be executed in the right order fortunately sklearn provides the Pipelineclass to help with such sequences
+    
+    # below is a small pipeline for numerical attributes which will first impute then scale the imput features
+    
+    
+    num_pipeline = Pipeline([
+        ("impute", SimpleImputer(strategy="median")),
+        ("standardize", StandardScaler())
+    ])
+    
+    # or you can define it like this
+    # this will take transformers as positional arguments and creates a pipeline using the names of the transformer's classes
+    
+    num_pipeline = make_pipeline(SimpleImputer(strategy="median"), StandardScaler())
+    
+    #when we call fit on this, it called fit_transform() sequentially on all the transformers, passing the output of each call as the param to the next call until it reaches the final estimator
+    
+    housing_num_prepared = num_pipeline.fit_transform(housing_num)
+    #print(housing_num_prepared[:2].round(2))
+    
+    #this only accounts for numerical columns though, so it would be nice to have one that supports all types of columns
+    #for this we can use a ColumnTransformer
+    
+    num_attributes = ["longitude", "latitude", "housing_median_age", "total_rooms", "total_bedrooms", "population", "households", "median_income"]
+    cat_attributes = ["ocean_proximity"]
+    
+    cat_pipeline = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore"))
+    
+    prepocessing = ColumnTransformer([
+        ("num", num_pipeline, num_attributes),
+        ("cat", cat_pipeline, cat_attributes)
+    ])
+    
+    #naming all of the column names kinda sucked, thankfully we can use scikit-learn's make_column_selector
+    
+    better_preprocessing = make_column_transformer(
+        (num_pipeline, make_column_selector(dtype_include=np.number)),
+        (cat_pipeline, make_column_selector(dtype_include=object))
+    )
+        
+    #now we can apply this ColumnTransformer to the housing data
+    
+    housing_prepared = better_preprocessing.fit_transform(data)
+    
     
     return
 
