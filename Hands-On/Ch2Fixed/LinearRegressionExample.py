@@ -122,10 +122,5 @@ def main():
     print(f"Train RMSE: {train_rmse:,.2f}")
     print(f"Test RMSE:  {test_rmse:,.2f}")
     
-    #print(test_transformed.iloc[:5].values)
-    
-    lin_rmse = root_mean_squared_error(test_labels, test_predictions)
-    print(f"RMSE: {lin_rmse:,.5f}")
-    
 if __name__ == "__main__":
     main()
