@@ -11,24 +11,29 @@ from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler, S
 from ClusterSimularity import ClusterSimularity
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer, make_column_selector, make_column_transformer
+from sklearn.linear_model import LinearRegression
 #This program is ripped mostly from the book, once all programming is copied over here, i will perform my own version as if it were a real project
 
-def clean_data(data):
+def clean_data(traindata, testdata):
     #median = data["total_bedrooms"].median()
     #data["total_bedrooms"].fillna(median, inplace=True)
 
     #instantiate an imputer (defining missing values as their columns median to not skew data as bad)
     imputer = SimpleImputer(strategy="median")
+    
+    housing_labels = traindata["median_house_value"].copy()
+    
+    traindata = traindata.drop("median_house_value", axis=1)
 
     #not all columns are int's
     #get only int's to caclulate the median
 
-    housing_num = data.select_dtypes(include=[np.number])
+    housing_num = traindata.select_dtypes(include=[np.number])
     
     imputer.fit(housing_num)
 
     #translate ocean proximity to a numerical value
-    housing_category = data[["ocean_proximity"]]
+    housing_category = traindata[["ocean_proximity"]]
     
     ordinal_encoder = OrdinalEncoder()
     
@@ -59,11 +64,11 @@ def clean_data(data):
     # we are doing this because of the heavy tail it has
     
     log_transformer = FunctionTransformer(np.log, inverse_func=np.exp)
-    log_pop = log_transformer.transform(data[["population"]])
+    log_pop = log_transformer.transform(traindata[["population"]])
     
     # here is an example of a custom transformer
     cluster_simu = ClusterSimularity(n_clusters=10, gamma=1, random_state=42)
-    similarities = cluster_simu.fit_transform(data[["latitude", "longitude"]], sample_weight=data["population"])
+    similarities = cluster_simu.fit_transform(traindata[["latitude", "longitude"]], sample_weight=traindata["population"])
     
     # plt.figure(figsize=(12, 8))
     # scatter = plt.scatter(data["longitude"], data["latitude"], 
@@ -76,7 +81,7 @@ def clean_data(data):
     # plt.show()
     # plt.savefig("cluster_similarities.png")
     
-    #print(similarities[:3].round(2))
+    #print(similarities[:3].round(2))f
     
     
     # there are many transformation steps tha need be executed in the right order fortunately sklearn provides the Pipelineclass to help with such sequences
@@ -121,8 +126,18 @@ def clean_data(data):
         
     #now we can apply this ColumnTransformer to the housing data
     
-    housing_prepared = better_preprocessing.fit_transform(data)
+    housing_prepared = better_preprocessing.fit_transform(traindata)
     
+    #print(housing_prepared.shape)
+    #print(better_preprocessing.get_feature_names_out())
+    
+    lin_reg = make_pipeline(better_preprocessing, LinearRegression())
+    lin_reg.fit(traindata, housing_labels)
+    
+    housing_predictions = lin_reg.predict(testdata)
+    print(housing_predictions[:5].round(2))
+    print("------")
+    print(testdata.iloc[:5].values)
     
     return
 
@@ -169,8 +184,7 @@ def main():
     #california_housing = fetch_california_housing(as_frame=True)
     housing = load_housing_data()
     
-    clean_data(housing)
-    return
+
 
     #plot housing just for visualization
 
@@ -196,9 +210,13 @@ def main():
     plt.savefig("incomeCategory.png")
     #shuffle data and return train and test sets
     train_set, test_set = shuffle_and_split_data(housing, 0.2)
-    print(len(train_set), len(test_set))
+#    print(len(train_set), len(test_set))
 
 
+
+    print(test_set[:5])
+    clean_data(train_set, test_set)
+    return
     #corr_matrix = housing.corr()
 
     #vals = corr_matrix["median_house_value"].sort_values(ascending=False)
