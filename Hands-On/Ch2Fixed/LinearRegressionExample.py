@@ -1,15 +1,20 @@
-from pathlib import Path
-import pandas as pd
 import tarfile
 import urllib.request
+from pathlib import Path
 import numpy as np
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
-from sklearn.pipeline import Pipeline, make_pipeline
+import pandas as pd
+from sklearn import preprocessing
 from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
-from ClusterSimularity import ClusterSimularity
 from sklearn.metrics import root_mean_squared_error
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
+from ClusterSimularity import ClusterSimularity
+import joblib
+
+def rmse(squared_errors):
+    return np.sqrt(np.mean(squared_errors))
 def cat_pipeline():
     return Pipeline([
         ("imputer", SimpleImputer(strategy="most_frequent")),
@@ -49,23 +54,23 @@ def process_and_clean_data(traindata, testdata):
     ],
                                       remainder=default_num_pipeline)
     
-    return preprocessing.fit_transform(traindata), preprocessing.transform(testdata)
+    return preprocessing.fit_transform(traindata), preprocessing.transform(testdata), preprocessing
 
 def shuffle_and_split_data(data, test_ratio):
     
     #randomly shuffle the data
-    shuffled_indicies = np.random.permutation(len(data))
+    shuffled_indices = np.random.permutation(len(data))
 
     #total amount of items to set aside = length of data * test_ratio parameter
     test_set_size = int(len(data) * test_ratio)
 
-    #test indicies = all after test_set_size index
-    test_indicies = shuffled_indicies[:test_set_size]
+    #test indices = all after test_set_size index
+    test_indices = shuffled_indices[:test_set_size]
 
     #training is same as above but all before the given index
-    train_indicies = shuffled_indicies[test_set_size:]
+    train_indices = shuffled_indices[test_set_size:]
 
-    return data.iloc[train_indicies], data.iloc[test_indicies]
+    return data.iloc[train_indices], data.iloc[test_indices]
 
 def load_housing_data():
     tarball_path = Path("datasets/housing.tgz")
@@ -85,35 +90,41 @@ def load_housing_data():
     return pd.read_csv(Path("datasets/housing/housing.csv"))
 
 def main():
-    #this will serve as a fixed and consise version of the ch2 project
+    #this will serve as a fixed and concise version of the ch2 project
     
     #since we have already visualized our data, we will skip straight to processing
     
     housing = load_housing_data()
     
-    #seperate into our train sets and test sets
+    #separate into our train sets and test sets
     
     train_set, test_set = shuffle_and_split_data(housing, 0.2)
     
     #get labels we want to predict 
     train_labels = train_set["median_house_value"]
     test_labels = test_set["median_house_value"]
-    
+
+    #value to compute final rmse
+    y_test = test_set["median_house_value"].copy()
+
     #then drop them
     train_set = train_set.drop("median_house_value", axis=1)
     test_set = test_set.drop("median_house_value", axis=1)
     
-    train_transformed, test_transformed = process_and_clean_data(train_set, test_set)
+    train_transformed, test_transformed, preprocessing = process_and_clean_data(train_set, test_set)
     
     lin_reg = LinearRegression()
     
     
     #           data features      predict this
     lin_reg.fit(train_transformed, train_labels)
-    
+
+    #we dropped the median_house_value from all of the data, we are trying to predict that based on the features of
+    #the other data
+
     test_predictions = lin_reg.predict(test_transformed)
-    
-    print(test_predictions[:5])
+    print("predictions:", test_predictions[:10])
+    print("actual values:", test_labels[:10])
         # Compare train vs test RMSE to check for overfitting
     train_predictions = lin_reg.predict(train_transformed)
     train_rmse = root_mean_squared_error(train_labels, train_predictions)
@@ -121,6 +132,12 @@ def main():
     
     print(f"Train RMSE: {train_rmse:,.2f}")
     print(f"Test RMSE:  {test_rmse:,.2f}")
-    
+
+    #average rmse of 68k or ~27% ish
+    #not bad not great, pretty comparable to what was being predicted before
+
+    preprocessing.fit(train_set)
+    joblib.dump(lin_reg, "models/california_housing_linreg.pkl")
+    joblib.dump(preprocessing, "models/california_housing_preprocessing.pkl")
 if __name__ == "__main__":
     main()

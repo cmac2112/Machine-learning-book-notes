@@ -26,7 +26,7 @@ def clean_data(traindata, testdata):
     traindata = traindata.drop("median_house_value", axis=1)
 
     #not all columns are int's
-    #get only int's to caclulate the median
+    #get only int's to calculate the median
 
     housing_num = traindata.select_dtypes(include=[np.number])
     

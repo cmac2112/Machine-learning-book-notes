@@ -1,1 +1,2 @@
 this is where chapter 3 notes will go
+
