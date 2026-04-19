@@ -1,2 +1,8 @@
-this is where chapter 3 notes will go
+#ch 3 Classification
+
+most common supervised learning tasks are regression and classification,
+ this chapter will be about the classification part
+
+In this chapter we use the MNIST dataset, which is a set of 70,000 small images of handwritten digits. Each image is labeled with the digit it represents (0 to 9). The goal is to train a model that can recognize these digits.
+
 
