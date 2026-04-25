@@ -7,7 +7,7 @@ from DataProcessors import DataProcessor
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import cross_val_score, cross_val_predict
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
 
 def main():
     mnist = fetch_openml('mnist_784', as_frame=False)
@@ -60,8 +60,10 @@ def main():
     cm = confusion_matrix(y_train_fives, y_train_pred)
     print(cm) #each row represents an actual class, while each column represents a predicted class.
 
+    #lets take a look at the precision and recall scores
+    print(precision_score(y_train_fives, y_train_pred))
 
-
+    print(recall_score(y_train_fives, y_train_pred))
 
     #go through vals, save some true images
 

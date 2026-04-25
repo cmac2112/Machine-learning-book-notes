@@ -57,3 +57,32 @@ compared to the actual targets.
  ```
 ![img.png](img.png)
 53,892 were correctly classified as not 5's (true negatives), 687 were incorrectly classified as 5's (false positives), 1,891 were incorrectly classified as not 5's (false negatives), and 3530 were correctly classified as 5's (true positives).
+A perfect classifier would have only true positives and true negatives
+
+Confusion matrix gives a lot but, we can look at the accuracy of the positive predictions; this is called precision of the classifier
+
+`precision = true positives / (true positives + false positives)`
+
+a trival way to have a perfect precision is to create a classifier that always makes negative predictions except for one single positive
+that it is the most confident about. While it would be precise it would not be useful since it would ignore all but one positive
+
+so we pair precision with another metric called recall (also called sensitivity or true positive rate)
+This is the ratio of positive instances that are correctly detected by the classifier
+
+`recall = true positives / (true positives + false negatives)`
+
+It is often conveinient to combine precision and recall into a single metric called the F score.
+
+The F score is the harmonic mean of precision and recall. Where a regular mean treats all values equally, the harmonic mean give more weight to low values.
+As a result the classifier will only get a high F score if both recall and precision are high
+
+`F = 2 / (1/precision + 1/recall)`
+
+F score favors classifies that have similar precision and recall
+
+Howver in some contexts this is not what you want, example: your classifier is build to detect
+videos that are safe for kids, you would prefer a classifier that rejects many good videos (low recall) but keeps only safe ones (high precision)
+rather than a classifier that has much higher recall but lets a few bad videos in.
+
+On the other hand your classifier might detect shoplifters in surveillance images, its probably fine if your classifier only has 30% precision but as long as it has 99% recall, you can have security guards check the 30% of the images that are flagged as shoplifters and catch most of the shoplifters while only having to check a small fraction of the images. In this case you would prefer a classifier with high recall even if it has low precision.
+
