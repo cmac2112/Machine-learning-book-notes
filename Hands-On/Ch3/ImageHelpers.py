@@ -3,6 +3,7 @@ class ImageHelpers:
     def __init__(self, data):
         self.data = data
 
+    #plots the instance's data image
     def plot_digit(self):
         image = self.data.reshape(28,28)
         plt.imshow(image, cmap='binary')

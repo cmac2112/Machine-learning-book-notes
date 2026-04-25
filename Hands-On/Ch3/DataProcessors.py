@@ -22,5 +22,7 @@ class DataProcessor:
         y_test_vals = (self.test_y == val)
 
         return y_train_vals, y_test_vals
+
+    #returns the instance's values just cuz
     def return_values(self):
         return self.train_x, self.train_y, self.test_x, self.test_y
