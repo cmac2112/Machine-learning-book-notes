@@ -86,3 +86,51 @@ rather than a classifier that has much higher recall but lets a few bad videos i
 
 On the other hand your classifier might detect shoplifters in surveillance images, its probably fine if your classifier only has 30% precision but as long as it has 99% recall, you can have security guards check the 30% of the images that are flagged as shoplifters and catch most of the shoplifters while only having to check a small fraction of the images. In this case you would prefer a classifier with high recall even if it has low precision.
 
+# Precision/Recall Tradeoff
+
+To undersstand the tradeoff we can look at how SGDClassifier makes its classification decisions.
+
+Foreach instance
+    it computes the score based on the decision function
+
+    If its greater than a threshhold, it assigns the instance to the positive class.
+however it depends on what you set the threshold as. Set it higher and youll have high precision but low recall since you are ignoring potential positives that do not meet the threshold, set it low and the opposite happens, you have low precision but high recall
+
+```python
+# precision/recall tradeoff ---------------------
+    y_scores = sgd_clf.decision_function([5])
+    print(y_scores)
+    threshold = 0
+    y_some_digit_pred = (y_scores > threshold)
+    print(y_some_digit_pred)
+```
+
+How can we decide what threshold to use?
+
+we can first use `cross_val_predict()` to get the scores of all instances in the training set, but this time specify we want to return the decision scores instead of predictions
+
+and we can plot the values onto a graph to visualize. 
+
+
+![alt text](image.png)
+x = threshold
+y = Score (how much recall/how much precision)
+
+# lets find the most optimal threshold
+    
+if we aim for 90% precision, we can use the first plot to find the threshold but its not precisce. Alternatively we can saerch for the lowest threshold that gives us 90% precision.
+    we can use the NumPy array's argmax() method, returns the first index of the maximum value
+
+``` python
+index_for_90_precision = (precisions >= 0.90).argmax()
+    threshold_for_90_precision = thresholds[index_for_90_precision]
+
+    #now we can find the values    
+    y_train_pred_90 = (y_scores >= threshold_for_90_precision)
+    
+    print(f"precision score {precision_score(y_train_fives, y_train_pred_90)}")
+    
+    
+    recall_at_90_precision = recall_score(y_train_fives, y_train_pred_90)
+    print(f" recall at 90 - {recall_at_90_precision}")    
+```
