@@ -134,3 +134,13 @@ index_for_90_precision = (precisions >= 0.90).argmax()
     recall_at_90_precision = recall_score(y_train_fives, y_train_pred_90)
     print(f" recall at 90 - {recall_at_90_precision}")    
 ```
+
+## The ROC Curve
+
+the receiver operating characteristic (ROC) curve is another common tool used with binary classifiers. Its similar to the precision/recall curve but it plots the <b>true positive rate</b> against the <b>false positive rate</b> aka the fallout is the <b>ratio of negative instaqnces that are incorrectly classified as positive</b>. It is equal to (1 - true negative rate). Where <b>true negative rate</b> is the ratio of negative instances that are correctly classifdied as negative. 
+
+## Multiclass Classification
+
+Where binary classfiers distinguish between two classes, multiclass classifiers can distinguish between more than two classes
+
+
