@@ -7,8 +7,8 @@ from DataProcessors import DataProcessor
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import cross_val_score, cross_val_predict
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, precision_recall_curve
-
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, precision_recall_curve, ConfusionMatrixDisplay
+from sklearn.preprocessing import StandardScaler
 def main():
     mnist = fetch_openml('mnist_784', as_frame=False)
 
@@ -96,6 +96,7 @@ def main():
     
     precisions, recalls, thresholds = precision_recall_curve(y_train_fives, y_scores)
     
+    plt.figure()
     plt.plot(thresholds, precisions[:-1], "b--", label="Precision", linewidth=2)
     plt.plot(thresholds, recalls[:-1], "g-", label="Recall", linewidth=2)
     plt.vlines(thresholds, 0, 1.0, "k", "dotted", label="threshold")
@@ -104,6 +105,7 @@ def main():
     
     
     # also can plot precision against the recall directly
+    plt.figure()
     plt.plot(recalls, precisions, linewidth=2, label="Precision/Recall curve")
     plt.savefig(f"precision-recall-curve.png")
     
@@ -124,7 +126,18 @@ def main():
     recall_at_90_precision = recall_score(y_train_fives, y_train_pred_90)
     print(f" recall at 90 - {recall_at_90_precision}")    
     
+    #display confusion matrix pg122
     
+    scaler = StandardScaler()
+    #scale only the training set: instance.x is all 70,000 rows, train_y is only the first 60,000
+    X_train_scaled = scaler.fit_transform(instance.train_x.astype("float64"))
+
+    #this is now a MULTICLASS problem - train_y holds the real labels "0".."9", not the boolean 5/not-5 vector
+    y_train_pred_multi = cross_val_predict(sgd_clf, X_train_scaled, instance.train_y, cv=3)
+
+    plt.figure()
+    ConfusionMatrixDisplay.from_predictions(instance.train_y, y_train_pred_multi)
+    plt.savefig("confusionmatrix.png")
 
 if __name__ == "__main__":
     main()

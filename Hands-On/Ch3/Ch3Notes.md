@@ -139,6 +139,28 @@ index_for_90_precision = (precisions >= 0.90).argmax()
 
 the receiver operating characteristic (ROC) curve is another common tool used with binary classifiers. Its similar to the precision/recall curve but it plots the <b>true positive rate</b> against the <b>false positive rate</b> aka the fallout is the <b>ratio of negative instaqnces that are incorrectly classified as positive</b>. It is equal to (1 - true negative rate). Where <b>true negative rate</b> is the ratio of negative instances that are correctly classifdied as negative. 
 
+```python
+below is the output of Classification.py
+
+x-shape(70000, 784) : y-shape (70000,)
+x: [[0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ ...
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]]
+Cross Validation Score: [0.87745 0.85835 0.8698 ]
+False
+[0.90958333 0.90966667 0.90966667 0.90966667 0.90966667]
+[[53892   687]
+ [ 1891  3530]]
+0.8370879772350012
+0.6511713705958311
+precision score 0.9000345901072293
+ recall at 90 - 0.4799852425751706
+```
+
 ## Multiclass Classification
 
 Where binary classfiers distinguish between two classes, multiclass classifiers can distinguish between more than two classes
