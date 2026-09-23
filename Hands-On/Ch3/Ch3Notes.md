@@ -144,3 +144,11 @@ the receiver operating characteristic (ROC) curve is another common tool used wi
 Where binary classfiers distinguish between two classes, multiclass classifiers can distinguish between more than two classes
 
 
+scikit learn classifies such as LogisticRegresssion, RandomForestClassifier and GaussianNB are ccapable of hanbdling mutiple classes natively.
+
+One way to create a system that can classify the digit images into 10 classes is to train 10 binary classifiers, one for each digit. Then when you want to classify an image, you get the score from each classifer.
+then keep the largest score from a classifer. This is called the one-verrsus-the-rest strategy, or sometimes one-versus-all
+
+You could also train a binary classifier for every pair of digits: one to distinguish 0s and 1s another for 0s and 2s, another for 1s and 2s and so on. This is called the one-verses-one strategy where If there are N classes you need to train N x (N - 1) / 2 classifiers.
+
+when you want to classify and iimage you have to run the image through all 45 classifiers and see which class wins the most duels. The main advantage of this  is that each classifer only needs to be trains on the part of the training set containing the two classes that it must distinguish. Some algorithms scale poorly with the size of the training set. In these instances one-versus-one approach is preferred because it is faster to train many classifiers on smaller sets than to traiin few on large ones. However for most instances OvR is preferred
