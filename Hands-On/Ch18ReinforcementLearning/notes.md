@@ -30,3 +30,9 @@ b. use a genetic algorithm - randomly create a first generation of 100 policies 
 c. other optimization techniques by evaluating the gradients of the rewards with regard to the policy parameters, then tweaking these parameters by following the gradients toward higher rewards - policy gradient - you could slightly increase p and evaluate whether doing so increases the amount of dust picked up by the robot in 30 minutes; if it does then increase p some more, or else reduce p. We will need to implement a popular PG algorithm using TensorFlow.
 
 
+## Openai gym
+a challenge of reinforcement learning is having a working environment. Training is hard and slow in the real world, that is why we need simulated environments.
+
+For example you might yse PyBullet or MuJoCo for 3D physics simulation
+
+OpenAI gym is a toolkit that provides a wide variety of simulated environments that you can use to train agents.

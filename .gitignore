@@ -9,3 +9,4 @@
 /.idea/vcs.xml
 Hands-On/Ch3/__pycache__/DataProcessors.cpython-313.pyc
 .gitignore
+.venv/
