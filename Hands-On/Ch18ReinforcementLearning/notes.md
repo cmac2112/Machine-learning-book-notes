@@ -101,3 +101,11 @@ Now we can train our first agent with policy gradients
 
 ## Policy Gradients
 PG algorithms optimiize the parameters of a policy by following the gradients toward higher rewards. 
+
+A popular class of PG algorithms called `reinforce` algorithms was introduced back in 1992
+
+here is a common varient:
+1. First let the neural network policy play the game several times, and at each step compute the gradients that would make the chosen action even more likely but dont apply these gradients yet
+2. Once you have run several episodes, compute each action's advantage, using the method described in the previous section
+3. If an action's advantage is positive, it means that the action was probably good, and you want to apply the gradients computed earlier to make the action even more likely to be chosen in the future, however iif the actions advantage is negative, it means the action was probably bad, and you want to apply the opposite gradients to make this action slightly less likeley in the future. The solution is to multiply each gradient vector by the corresponding action's advantage
+4. Finally, compute the mean of all the resulting gradient vectors, and use it to perform a gradien decent step
